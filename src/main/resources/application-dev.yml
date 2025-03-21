@@ -12,7 +12,7 @@ spring:
       hibernate:
         format_sql: true
     database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect #tells Hibernate how to generate SQL optimized for PostgreSQL.
 
   mail:
     host: localhost
@@ -26,6 +26,7 @@ spring:
         auth: true
         starttls:
           enable: true
+          require: true
         connectiontimout: 5000
         timeout: 3000
         writetimeout: 5000
