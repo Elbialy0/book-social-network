@@ -23,10 +23,10 @@ spring:
       mail:
         smtp:
           trust:
-        auth: true
+        auth: true # send the username and the password with the email to smtp server
         starttls:
-          enable: true
+          enable: true # for encrypt the email
           require: true
-        connectiontimout: 5000
-        timeout: 3000
-        writetimeout: 5000
+        connectiontimout: 5000 #How long to wait (in milliseconds) for initial connection to the SMTP server.
+        timeout: 3000 # How long to wait for a response from the server after sending a request (e.g., authentication, sending email).
+        writetimeout: 5000 # How long to wait for data to be written to the server before failing.
