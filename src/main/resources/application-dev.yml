@@ -30,3 +30,8 @@ spring:
         connectiontimout: 5000 #How long to wait (in milliseconds) for initial connection to the SMTP server.
         timeout: 3000 # How long to wait for a response from the server after sending a request (e.g., authentication, sending email).
         writetimeout: 5000 # How long to wait for data to be written to the server before failing.
+application:
+  security:
+    jwt:
+      secret-key: 313d7f774f2e6af789445466d8f53a578b65dc3da593bd0bbf6e7445341522bfc0961d6abb192de75f944f8c6fc53224506efcdf17fec92f14f9a08ed377fecb
+      expiration: 864000
