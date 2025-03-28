@@ -5,6 +5,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -20,4 +22,7 @@ public class Token {
     @ManyToOne
     @JoinColumn(name = "userId",nullable = false)
     private User user;
+    private LocalDateTime createdAt;
+    private LocalDateTime expiresAt;
+    private LocalDateTime activatedAt;
 }
