@@ -1,6 +1,5 @@
 package com.elbialy.book.projectSecurityConfiguration;
 
-import com.elbialy.book.user.User;
 import com.elbialy.book.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
