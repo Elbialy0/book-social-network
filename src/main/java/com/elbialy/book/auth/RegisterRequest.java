@@ -16,10 +16,10 @@ import org.springframework.web.service.annotation.GetExchange;
 public class RegisterRequest {
     @NotEmpty(message = "Firstname is mandatory")
     @NotBlank(message = "Firstname is mandatory")
-    private String firstName;
+    private String firstname;
     @NotEmpty(message = "Lastname is mandatory")
     @NotBlank(message = "Lastname is mandatory")
-    private String lastName;
+    private String lastname;
 
     @NotEmpty(message = "Email is mandatory")
     @NotBlank(message = "Email is mandatory")

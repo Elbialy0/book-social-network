@@ -6,15 +6,18 @@ import com.elbialy.book.user.Token;
 import com.elbialy.book.user.TokenRepository;
 import com.elbialy.book.user.User;
 import com.elbialy.book.user.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -26,8 +29,11 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final TokenRepository tokenRepository;
+    private final EmailService emailService;
 
-    public void register( RegisterRequest registerRequest) {
+    String activationUrl = "http://localhost:8080/api/v1/auth/activation";
+
+    public void register( RegisterRequest registerRequest) throws MessagingException {
         var roleUser = roleRepository.findByName("USER")
                 .orElseThrow(()-> new IllegalStateException("Role does not exist"));
         Optional<User> email = userRepository.findByEmail(registerRequest.getEmail());
@@ -35,8 +41,8 @@ public class AuthenticationService {
             throw new EmailAlreadyExist(registerRequest.getEmail()+" is already registered");
         }
         var user = User.builder()
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
+                .firstName(registerRequest.getFirstname())
+                .lastName(registerRequest.getLastname())
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .accountLocked(false)
@@ -48,19 +54,28 @@ public class AuthenticationService {
 
     }
 
-    private void sendValidationEmail(User user) {
+    private void sendValidationEmail(User user) throws MessagingException {
         var token = generateAndSaveActivationToken(user);
     }
 
-    private Token generateAndSaveActivationToken(User user) {
+    private Token generateAndSaveActivationToken(User user) throws MessagingException {
         String generatedToken = generateActivationCode(6);
         var token = Token.builder()
                 .token(generatedToken)
                 .createdAt(LocalDateTime.now())
-                .activatedAt(LocalDateTime.now().plusMinutes(5))
+                .expiresAt(LocalDateTime.now().plusMinutes(5))
                 .user(user)
                 .build();
         tokenRepository.save(token);
+        emailService.sendEmail(
+                user.getEmail(),
+                user.getFullName(),
+                EmailTemplateName.ACTIVATE_ACCOUNT,
+                activationUrl,
+                generatedToken,
+                "Account activation"
+
+        );
         return token;
     }
 
