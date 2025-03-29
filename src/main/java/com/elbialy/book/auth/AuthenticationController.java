@@ -19,7 +19,14 @@ public class AuthenticationController {
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequest registerRequest) throws MessagingException {
         service.register(registerRequest);
         return ResponseEntity.accepted().build();
+    }
 
+    @PostMapping("/authenticate")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody @Valid AuthenticationRequest authenticationRequest
+    ){
+        return ResponseEntity.ok(service.authenticate(authenticationRequest));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.elbialy.book.auth;
 
 import com.elbialy.book.exceptions.EmailAlreadyExist;
+import com.elbialy.book.projectSecurityConfiguration.JwtService;
 import com.elbialy.book.role.RoleRepository;
 import com.elbialy.book.user.Token;
 import com.elbialy.book.user.TokenRepository;
@@ -10,15 +11,14 @@ import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,8 @@ public class AuthenticationService {
     private final RoleRepository roleRepository;
     private final TokenRepository tokenRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     String activationUrl = "http://localhost:8080/api/v1/auth/activation";
 
@@ -88,5 +90,20 @@ public class AuthenticationService {
             activationCode.append(characters.charAt(randomIndex));
         }
         return activationCode.toString();
+    }
+
+    public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
+
+            var auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
+                            authenticationRequest.getPassword() ));
+            var user = (User)auth.getPrincipal();
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("fullname",user.getFullName());
+            String jwt = jwtService.generateToken(claims,user);
+            return AuthenticationResponse.builder().token(jwt).build();
+
+
+
     }
 }
