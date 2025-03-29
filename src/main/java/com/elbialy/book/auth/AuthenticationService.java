@@ -107,9 +107,10 @@ public class AuthenticationService {
 
     }
 
-    public void activateAccount(String token) {
+    public void activateAccount(String token) throws MessagingException {
         Token confirmation = tokenRepository.findByToken(token)
-                .orElseThrow(()->new IllegalStateException("Token does not exist"));
+                // todo exception has to be defined
+                .orElseThrow(()->new RuntimeException("Token does not exist"));
         if(!confirmation.getExpiresAt().isBefore(LocalDateTime.now())){
             var user = confirmation.getUser();
             user.setEnabled(true);
@@ -118,7 +119,8 @@ public class AuthenticationService {
             tokenRepository.save(confirmation);
         }
         else {
-            throw new RuntimeException("Token expired");
+            sendValidationEmail(confirmation.getUser());
+            throw new RuntimeException("Token expired, A new one has been sent to your account.");
         }
     }
 }
