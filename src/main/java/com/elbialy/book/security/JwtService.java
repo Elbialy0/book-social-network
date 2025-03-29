@@ -1,4 +1,4 @@
-package com.elbialy.book.projectSecurityConfiguration;
+package com.elbialy.book.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

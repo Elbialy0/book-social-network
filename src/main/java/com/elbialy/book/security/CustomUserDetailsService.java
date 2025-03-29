@@ -1,4 +1,4 @@
-package com.elbialy.book.projectSecurityConfiguration;
+package com.elbialy.book.security;
 
 import com.elbialy.book.user.UserRepository;
 import jakarta.transaction.Transactional;

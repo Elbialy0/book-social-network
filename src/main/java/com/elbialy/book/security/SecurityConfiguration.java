@@ -1,4 +1,4 @@
-package com.elbialy.book.projectSecurityConfiguration;
+package com.elbialy.book.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

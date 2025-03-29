@@ -1,7 +1,7 @@
 package com.elbialy.book.auth;
 
 import com.elbialy.book.exceptions.EmailAlreadyExist;
-import com.elbialy.book.projectSecurityConfiguration.JwtService;
+import com.elbialy.book.security.JwtService;
 import com.elbialy.book.role.RoleRepository;
 import com.elbialy.book.user.Token;
 import com.elbialy.book.user.TokenRepository;
