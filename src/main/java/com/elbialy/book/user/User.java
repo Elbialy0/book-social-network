@@ -1,5 +1,7 @@
 package com.elbialy.book.user;
 
+import com.elbialy.book.book.Book;
+import com.elbialy.book.history.BookTransactionHistory;
 import com.elbialy.book.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,6 +47,12 @@ public class User implements UserDetails, Principal {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookTransactionHistory> histories;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Book> books;
 
     @Override
     public String getName() {

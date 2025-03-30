@@ -1,7 +1,8 @@
-package com.elbialy.book.feedback;
+package com.elbialy.book.history;
 
 import com.elbialy.book.book.Book;
 import com.elbialy.book.common.BaseEntity;
+import com.elbialy.book.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,11 +18,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-public class Feedback extends BaseEntity {
-    private double note;
-    private String comment;
-
+public class BookTransactionHistory extends BaseEntity {
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
     @ManyToOne
     @JoinColumn(name = "book_id")
     private Book book;
+    private boolean returned;
+    private boolean returnApproved;
+
 }
