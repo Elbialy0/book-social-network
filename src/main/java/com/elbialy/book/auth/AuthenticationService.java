@@ -1,6 +1,5 @@
 package com.elbialy.book.auth;
 
-import com.elbialy.book.exceptions.EmailAlreadyExist;
 import com.elbialy.book.security.JwtService;
 import com.elbialy.book.role.RoleRepository;
 import com.elbialy.book.user.Token;
@@ -40,7 +39,7 @@ public class AuthenticationService {
                 .orElseThrow(()-> new IllegalStateException("Role does not exist"));
         Optional<User> email = userRepository.findByEmail(registerRequest.getEmail());
         if (email.isPresent()){
-            throw new EmailAlreadyExist(registerRequest.getEmail()+" is already registered");
+            throw new RuntimeException(registerRequest.getEmail()+" is already registered");
         }
         var user = User.builder()
                 .firstName(registerRequest.getFirstname())
