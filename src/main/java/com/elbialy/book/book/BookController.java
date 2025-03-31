@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/books")
 @RequiredArgsConstructor
@@ -25,5 +27,10 @@ public class BookController {
     public ResponseEntity<BookResponse> getBook(@PathVariable Integer bookId) {
         return ResponseEntity.ok(bookService.findById(bookId));
 
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BookResponse>> getBooks() {
+        return ResponseEntity.ok(bookService.findAll());
     }
 }
