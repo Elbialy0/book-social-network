@@ -80,6 +80,28 @@ public class BookService {
 
 
     }
+
+    public PageResponse<BookResponse> getByOwner(int pageNumber, int pageSize, Authentication connectedUser) {
+        User user = (User) connectedUser.getPrincipal();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Book> books = bookRepository.findAll(pageable);
+        List<BookResponse> bookResponses = new ArrayList<BookResponse>();
+        for (Book book : books.getContent()) {
+            if (book.getOwner().getEmail().equals(user.getEmail())) {
+                bookResponses.add(mapper.bookToBookResponse(book));
+            }
+        }
+        return new PageResponse<>(
+                bookResponses,
+                books.getNumber(),
+                books.getSize(),
+                books.getTotalElements(),
+                books.getTotalPages(),
+                books.isFirst(),
+                books.isLast()
+        );
+
+    }
 }
 
 
