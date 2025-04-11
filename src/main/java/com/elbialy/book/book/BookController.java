@@ -1,5 +1,6 @@
 package com.elbialy.book.book;
 
+import com.elbialy.book.common.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,12 @@ public class BookController {
         return ResponseEntity.ok(bookService.findById(bookId));
 
     }
-
-    @GetMapping
-    public ResponseEntity<List<BookResponse>> getBooks() {
-        return ResponseEntity.ok(bookService.findAll());
+    @GetMapping("/getBooks")
+    public ResponseEntity<PageResponse<BookResponse>> getBooks(@RequestParam(name = "page",defaultValue ="0")int pageNumber,
+                                                               @RequestParam(name = "size",defaultValue = "10")int pageSize,
+                                                               Authentication connectedUser){
+        return ResponseEntity.ok(bookService.getAll(pageNumber,pageSize,connectedUser));
     }
+
+
 }
