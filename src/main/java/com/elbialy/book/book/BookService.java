@@ -13,9 +13,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -57,17 +57,12 @@ public class BookService {
                 .build();
     }
 
-    public PageResponse<BookResponse> getAll(int pageNumber, int pageSize,Authentication connectedUser) {
 
+    public PageResponse<BookResponse> getAll(int pageNumber, int pageSize, Authentication connectedUser) {
         User user = (User) connectedUser.getPrincipal();
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<Book> books = bookRepository.findAll(pageable);
-        List<BookResponse> bookResponses = new ArrayList<BookResponse>();
-        for (Book book : books.getContent()) {
-            if (!book.getOwner().getEmail().equals(user.getEmail())) {
-                bookResponses.add(mapper.bookToBookResponse(book));
-            }
-        }
+        Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
+        Page<Book> books = bookRepository.findAllBooks(pageable,user.getId());
+        List<BookResponse> bookResponses = books.getContent().stream().map(Mapper::bookToBookResponse).toList();
         return new PageResponse<>(
                 bookResponses,
                 books.getNumber(),
@@ -77,20 +72,13 @@ public class BookService {
                 books.isFirst(),
                 books.isLast()
         );
-
-
     }
 
     public PageResponse<BookResponse> getByOwner(int pageNumber, int pageSize, Authentication connectedUser) {
         User user = (User) connectedUser.getPrincipal();
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Page<Book> books = bookRepository.findAll(pageable);
-        List<BookResponse> bookResponses = new ArrayList<BookResponse>();
-        for (Book book : books.getContent()) {
-            if (book.getOwner().getEmail().equals(user.getEmail())) {
-                bookResponses.add(mapper.bookToBookResponse(book));
-            }
-        }
+        Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
+        Page<Book> books = bookRepository.findAllBooksByOwner(pageable,user.getId());
+        List<BookResponse> bookResponses = books.getContent().stream().map(Mapper::bookToBookResponse).toList();
         return new PageResponse<>(
                 bookResponses,
                 books.getNumber(),
@@ -100,7 +88,6 @@ public class BookService {
                 books.isFirst(),
                 books.isLast()
         );
-
     }
 }
 
