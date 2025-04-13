@@ -17,11 +17,10 @@ and book.owner.id != :id
 """)
     Page<Book> findAllBooks(Pageable pageable, Integer id);
     @Query("""
-select book 
+select book
 from Book book
 where book.owner.id = :id
-and book.archived = false
-    and book.shareable= true""")
+""")
 
     Page<Book> findAllBooksByOwner(Pageable pageable, Integer id);
 }

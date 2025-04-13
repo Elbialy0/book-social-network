@@ -1,20 +1,20 @@
 package com.elbialy.book.book;
 
 import com.elbialy.book.common.PageResponse;
+import com.elbialy.book.history.BookTransactionHistory;
+import com.elbialy.book.history.BookTransactionHistoryRepository;
 import com.elbialy.book.user.User;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-
-
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -22,7 +22,7 @@ import java.util.List;
 @Transactional
 public class BookService {
     private final BookRepository bookRepository;
-    private final Mapper mapper;
+    private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
 
     public Integer save(@Valid BookRequest bookRequest, Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -62,6 +62,38 @@ public class BookService {
         User user = (User) connectedUser.getPrincipal();
         Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
         Page<Book> books = bookRepository.findAllBooks(pageable,user.getId());
+        return pageResponse(books);
+
+    }
+
+    public PageResponse<BookResponse> getByOwner(int pageNumber, int pageSize, Authentication connectedUser) {
+        User user = (User) connectedUser.getPrincipal();
+        Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
+        Page<Book> books = bookRepository.findAllBooksByOwner(pageable,user.getId());
+        return pageResponse(books);
+
+    }
+
+    public PageResponse<BookResponse> getBorrowed(int pageNumber, int pageSize, Authentication connectedUser) {
+        User user = (User) connectedUser.getPrincipal();
+        Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
+        Page<BookTransactionHistory> allBorrowedBooks = bookTransactionHistoryRepository.findAllBorrowed(pageable,user.getId());
+
+        List<BookResponse> bookResponses = allBorrowedBooks.getContent().stream().map(BookTransactionHistory::getBook).toList()
+                .stream().map(Mapper::bookToBookResponse).toList();
+        return new PageResponse<>(
+                bookResponses,
+                allBorrowedBooks.getNumber(),
+                allBorrowedBooks.getSize(),
+                allBorrowedBooks.getTotalElements(),
+                allBorrowedBooks.getTotalPages(),
+                allBorrowedBooks.isFirst(),
+                allBorrowedBooks.isLast()
+        );
+
+
+    }
+    public static PageResponse<BookResponse> pageResponse(Page<Book> books){
         List<BookResponse> bookResponses = books.getContent().stream().map(Mapper::bookToBookResponse).toList();
         return new PageResponse<>(
                 bookResponses,
@@ -74,19 +106,20 @@ public class BookService {
         );
     }
 
-    public PageResponse<BookResponse> getByOwner(int pageNumber, int pageSize, Authentication connectedUser) {
+    public PageResponse<BookResponse> getReturned(int pageNumber, int pageSize, Authentication connectedUser) {
         User user = (User) connectedUser.getPrincipal();
         Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
-        Page<Book> books = bookRepository.findAllBooksByOwner(pageable,user.getId());
-        List<BookResponse> bookResponses = books.getContent().stream().map(Mapper::bookToBookResponse).toList();
+        Page<BookTransactionHistory> returnedBooks = bookTransactionHistoryRepository.findAllReturned(pageable,user.getId());
+        List<BookResponse> bookResponses = returnedBooks.getContent().stream().map(BookTransactionHistory::getBook).toList()
+                .stream().map(Mapper::bookToBookResponse).toList();
         return new PageResponse<>(
                 bookResponses,
-                books.getNumber(),
-                books.getSize(),
-                books.getTotalElements(),
-                books.getTotalPages(),
-                books.isFirst(),
-                books.isLast()
+                returnedBooks.getNumber(),
+                returnedBooks.getSize(),
+                returnedBooks.getTotalElements(),
+                returnedBooks.getTotalPages(),
+                returnedBooks.isFirst(),
+                returnedBooks.isLast()
         );
     }
 }

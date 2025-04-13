@@ -44,6 +44,22 @@ public class BookController {
     ){
         return ResponseEntity.ok(bookService.getByOwner(pageNumber,pageSize,connectedUser));
     }
+    @GetMapping("/borrowed")
+    public ResponseEntity <PageResponse<BookResponse>> findAllBorrowedBooks(
+            @RequestParam(name = "page",defaultValue = "0")int pageNumber,
+            @RequestParam(name = "size" , defaultValue = "10")int pageSize,
+            Authentication connectedUser
+    ){
+        return ResponseEntity.ok(bookService.getBorrowed(pageNumber,pageSize,connectedUser));
+    }
+    @GetMapping("/returned")
+    public ResponseEntity <PageResponse<BookResponse>> findAllReturnedBooks(
+            @RequestParam(name = "page",defaultValue = "0")int pageNumber,
+            @RequestParam(name = "size" , defaultValue = "10")int pageSize,
+            Authentication connectedUser
+    ){
+        return ResponseEntity.ok(bookService.getReturned(pageNumber,pageSize,connectedUser));
+    }
 
 
 }
