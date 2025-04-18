@@ -20,7 +20,7 @@ and history.user.id=:id
     @Query("""
 SELECT history
 FROM BookTransactionHistory history
-WHERE history.user.id=:id
+WHERE history.book.owner.id=:id
 AND history.returned=true
 AND history.returnApproved=true
 

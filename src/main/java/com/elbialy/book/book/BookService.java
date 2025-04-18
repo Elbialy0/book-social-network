@@ -74,13 +74,13 @@ public class BookService {
 
     }
 
-    public PageResponse<BookResponse> getBorrowed(int pageNumber, int pageSize, Authentication connectedUser) {
+    public PageResponse<BorrowedBookResponse> getBorrowed(int pageNumber, int pageSize, Authentication connectedUser) {
         User user = (User) connectedUser.getPrincipal();
         Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
         Page<BookTransactionHistory> allBorrowedBooks = bookTransactionHistoryRepository.findAllBorrowed(pageable,user.getId());
 
-        List<BookResponse> bookResponses = allBorrowedBooks.getContent().stream().map(BookTransactionHistory::getBook).toList()
-                .stream().map(Mapper::bookToBookResponse).toList();
+        List<BorrowedBookResponse> bookResponses = allBorrowedBooks.getContent().stream().map(Mapper::bookToBorrowedBookResponse).toList();
+
         return new PageResponse<>(
                 bookResponses,
                 allBorrowedBooks.getNumber(),
@@ -106,14 +106,13 @@ public class BookService {
         );
     }
 
-    public PageResponse<BookResponse> getReturned(int pageNumber, int pageSize, Authentication connectedUser) {
+    public PageResponse<BorrowedBookResponse> getReturned(int pageNumber, int pageSize, Authentication connectedUser) {
         User user = (User) connectedUser.getPrincipal();
         Pageable pageable = PageRequest.of(pageNumber,pageSize, Sort.by("createdDate").ascending());
         Page<BookTransactionHistory> returnedBooks = bookTransactionHistoryRepository.findAllReturned(pageable,user.getId());
-        List<BookResponse> bookResponses = returnedBooks.getContent().stream().map(BookTransactionHistory::getBook).toList()
-                .stream().map(Mapper::bookToBookResponse).toList();
+        List<BorrowedBookResponse> allReturnedBooks = returnedBooks.getContent().stream().map(Mapper::bookToBorrowedBookResponse).collect(Collectors.toList());
         return new PageResponse<>(
-                bookResponses,
+                allReturnedBooks,
                 returnedBooks.getNumber(),
                 returnedBooks.getSize(),
                 returnedBooks.getTotalElements(),
@@ -121,6 +120,7 @@ public class BookService {
                 returnedBooks.isFirst(),
                 returnedBooks.isLast()
         );
+
     }
 }
 

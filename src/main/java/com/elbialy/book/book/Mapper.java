@@ -1,5 +1,6 @@
 package com.elbialy.book.book;
 
+import com.elbialy.book.history.BookTransactionHistory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,6 +16,17 @@ public class Mapper {
                 .archived(book.isArchived())
                 .bookId(book.getId())
                 .owner(book.getOwner().getFullName())
+                .build();
+    }
+
+    public static BorrowedBookResponse bookToBorrowedBookResponse(BookTransactionHistory history) {
+        return BorrowedBookResponse.builder().rate(history.getBook().getRate())
+                .isbn(history.getBook().getIsbn())
+                .returned(history.isReturned())
+                .title(history.getBook().getTitle())
+                .authorName(history.getBook().getAuthorName())
+                .returnedApproved(history.isReturnApproved())
+                .bookId(history.getBook().getId())
                 .build();
     }
 }

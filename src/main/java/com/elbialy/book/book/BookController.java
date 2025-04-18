@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/books")
@@ -25,7 +25,7 @@ public class BookController {
 
     }
     @GetMapping("{book-id}")
-    public ResponseEntity<BookResponse> getBook(@PathVariable Integer bookId) {
+    public ResponseEntity<BookResponse> getBook(@PathVariable(name ="book-id") Integer bookId) {
         return ResponseEntity.ok(bookService.findById(bookId));
 
     }
@@ -45,7 +45,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getByOwner(pageNumber,pageSize,connectedUser));
     }
     @GetMapping("/borrowed")
-    public ResponseEntity <PageResponse<BookResponse>> findAllBorrowedBooks(
+    public ResponseEntity <PageResponse<BorrowedBookResponse>> findAllBorrowedBooks(
             @RequestParam(name = "page",defaultValue = "0")int pageNumber,
             @RequestParam(name = "size" , defaultValue = "10")int pageSize,
             Authentication connectedUser
@@ -53,7 +53,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBorrowed(pageNumber,pageSize,connectedUser));
     }
     @GetMapping("/returned")
-    public ResponseEntity <PageResponse<BookResponse>> findAllReturnedBooks(
+    public ResponseEntity <PageResponse<BorrowedBookResponse>> findAllReturnedBooks(
             @RequestParam(name = "page",defaultValue = "0")int pageNumber,
             @RequestParam(name = "size" , defaultValue = "10")int pageSize,
             Authentication connectedUser
