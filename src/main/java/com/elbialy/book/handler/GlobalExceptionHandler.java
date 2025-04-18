@@ -1,5 +1,6 @@
 package com.elbialy.book.handler;
 
+import com.elbialy.book.exceptions.OperationNotPermittedException;
 import jakarta.mail.MessagingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -78,6 +79,15 @@ public class GlobalExceptionHandler {
                                 "Try again later")
                         .error(e.getMessage())
                         .build()
+        );
+
+    }
+    @ExceptionHandler(OperationNotPermittedException.class)
+    public ResponseEntity<ExceptionResponse> handleOperationNotPermittedException(OperationNotPermittedException e) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            ExceptionResponse.builder().error(e.getMessage())
+                    .build()
         );
 
     }

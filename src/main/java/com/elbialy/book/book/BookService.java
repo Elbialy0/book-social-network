@@ -1,9 +1,11 @@
 package com.elbialy.book.book;
 
 import com.elbialy.book.common.PageResponse;
+import com.elbialy.book.exceptions.OperationNotPermittedException;
 import com.elbialy.book.history.BookTransactionHistory;
 import com.elbialy.book.history.BookTransactionHistoryRepository;
 import com.elbialy.book.user.User;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -121,6 +124,30 @@ public class BookService {
                 returnedBooks.isLast()
         );
 
+    }
+
+    public Integer updateShareable(Integer bookId, Authentication authentication) {
+        Book book = bookRepository.findById(bookId).orElseThrow(()->new EntityNotFoundException("Book not found"));
+        User user = (User) authentication.getPrincipal();
+        if(!Objects.equals(user.getId(),book.getOwner().getId())){
+
+            throw new OperationNotPermittedException("You cannot update books shareable status");
+        }
+        book.setShareable(!book.isShareable());
+        bookRepository.save(book);
+        return bookId;
+
+    }
+
+    public Integer updateArchive(Integer bookId, Authentication authentication) {
+        Book book = bookRepository.findById(bookId).orElseThrow(()->new EntityNotFoundException("Book not found"));
+        User user = (User) authentication.getPrincipal();
+        if(!Objects.equals(user.getId(),book.getOwner().getId())){
+            throw new OperationNotPermittedException("You cannot update books archive status");
+        }
+        book.setArchived(!book.isArchived());
+        bookRepository.save(book);
+        return bookId;
     }
 }
 
