@@ -1,6 +1,7 @@
 package com.elbialy.book.book;
 
 import com.elbialy.book.common.PageResponse;
+import com.elbialy.book.user.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,14 @@ public class BookController {
             Authentication authentication
     ){
         return ResponseEntity.ok(bookService.updateArchive(bookId,authentication));
+    }
+    @PostMapping("/borrow/{book-id}")
+    public ResponseEntity<Integer> borrowBook(@PathVariable(name = "book-id")int bookId, Authentication authentication){
+        return ResponseEntity.ok(bookService.borrowBook(bookId,(User) authentication.getPrincipal()));
+    }
+    @PatchMapping("/borrow/returned/{book-id}")
+    public ResponseEntity<Integer> borrowBookReturned(@PathVariable(name = "book-id")int bookId, Authentication authentication){
+        return ResponseEntity.ok(bookService.returnedBook(bookId,(User) authentication.getPrincipal()));
     }
 
 

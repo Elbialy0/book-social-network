@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+
+import java.util.Optional;
+
 @Repository
 public interface BookTransactionHistoryRepository extends JpaRepository<BookTransactionHistory, Integer> {
 
@@ -27,4 +30,11 @@ AND history.returnApproved=true
 """)
 
     Page<BookTransactionHistory> findAllReturned(Pageable pageable, Integer id);
+@Query("""
+select count(*)>0 from BookTransactionHistory b
+where b.user.id= :id and b.book.id=:bookId and b.returnApproved=false
+""")
+    boolean findByBook(int bookId, int id);
+
+    Optional<BookTransactionHistory> findHistoryByBook(Book book);
 }
