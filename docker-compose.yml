@@ -19,7 +19,7 @@ services:
     container_name: mail-dev-bsn
     image: maildev/maildev
     ports:
-      - 2081:2081
+      - 3080:3080
       - 1025:1025
     command: [ "--web", "2081", "--smtp", "1025", "--web-ip", "0.0.0.0" ]
 

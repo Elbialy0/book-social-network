@@ -84,6 +84,10 @@ public class BookController {
     public ResponseEntity<Integer> borrowBookReturned(@PathVariable(name = "book-id")int bookId, Authentication authentication){
         return ResponseEntity.ok(bookService.returnedBook(bookId,(User) authentication.getPrincipal()));
     }
+    @PatchMapping("/borrow/return/approved/{book-id")
+    public ResponseEntity<Integer> returnApproved(@PathVariable(name = "book-id")int bookId, Authentication authentication){
+        return ResponseEntity.ok(bookService.returnedApproved(bookId,(User) authentication.getPrincipal()));
+    }
 
 
 

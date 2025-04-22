@@ -198,6 +198,27 @@ public class BookService {
 
 
     }
+
+    public Integer returnedApproved(int bookId, User principal) {
+        Book book = bookRepository.findById(bookId).orElseThrow(()->new EntityNotFoundException("Book not found"));
+        if (book.isArchived()||!book.isShareable()){
+            throw new OperationNotPermittedException("Book is not shareable or archived");
+        }
+        if (Objects.equals(book.getOwner().getId(),principal.getId())){
+            throw new OperationNotPermittedException("You cannot borrow your own book");
+        }
+        BookTransactionHistory bookTransactionHistory =
+                bookTransactionHistoryRepository.findHistoryByBook(book).orElseThrow(()->new EntityNotFoundException("Book not found"));
+        if(!bookTransactionHistory.isReturned()){
+            throw new OperationNotPermittedException("Book is not returned");
+        }
+        if(bookTransactionHistory.isReturnApproved()){
+            throw new OperationNotPermittedException("Book is already approved for return");
+        }
+        bookTransactionHistory.setReturnApproved(true);
+        bookTransactionHistoryRepository.save(bookTransactionHistory);
+        return bookTransactionHistory.getId();
+    }
 }
 
 
