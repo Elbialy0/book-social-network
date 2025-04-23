@@ -15,6 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional
 public class BookService {
+    private static final String UPLOAD_DIR = "D:\\upload";
     private final BookRepository bookRepository;
     private final BookTransactionHistoryRepository bookTransactionHistoryRepository;
 
@@ -218,6 +224,36 @@ public class BookService {
         bookTransactionHistory.setReturnApproved(true);
         bookTransactionHistoryRepository.save(bookTransactionHistory);
         return bookTransactionHistory.getId();
+    }
+
+    public void saveBookCover(Integer bookId, MultipartFile cover, User principal) throws IOException {
+        if(cover==null){
+            throw new IOException("there is a problem in upload");
+        }
+        if(cover.getOriginalFilename()==null){
+            throw new IOException("there is a problem in upload");
+        }
+        String sanitizedFilename = Paths.get(cover.getOriginalFilename()).getFileName().toString()
+                .replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
+        int dotIndex = sanitizedFilename.lastIndexOf('.');
+        String baseName = (dotIndex == -1) ? sanitizedFilename : sanitizedFilename.substring(0, dotIndex);
+        String extension = (dotIndex == -1) ? "" : sanitizedFilename.substring(dotIndex);
+        String fileName = baseName + "_" + bookId + extension;
+        var savedCover = new File(UPLOAD_DIR + File.separator + fileName);
+        if (!Objects.equals(savedCover.getParent(), UPLOAD_DIR)){ // security check
+            throw new SecurityException("Unsafe file path");
+        }
+        Book book = bookRepository.findById(bookId).orElseThrow(()->new EntityNotFoundException("Book not found"));
+        if(!Objects.equals(book.getOwner().getId(), principal.getId())){
+            throw new OperationNotPermittedException("You cannot upload cover for book you don't own");
+        }
+        if (savedCover.exists()){
+            throw new IOException("Cover already exists");
+        }
+        cover.transferTo(savedCover);
+        book.setBookCover(savedCover.getAbsolutePath());
+        bookRepository.save(book);
+
     }
 }
 

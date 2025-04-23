@@ -3,12 +3,15 @@ package com.elbialy.book.book;
 import com.elbialy.book.common.PageResponse;
 import com.elbialy.book.user.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 
 
 @RestController
@@ -88,6 +91,15 @@ public class BookController {
     public ResponseEntity<Integer> returnApproved(@PathVariable(name = "book-id")int bookId, Authentication authentication){
         return ResponseEntity.ok(bookService.returnedApproved(bookId,(User) authentication.getPrincipal()));
     }
+
+    @PostMapping("/book-cover")
+    public ResponseEntity<Integer> saveBookCover(@RequestParam(name = "book-id")Integer bookId,
+                                                 @RequestParam(name = "cover") MultipartFile cover,
+                                                 Authentication authentication) throws IOException {
+        bookService.saveBookCover(bookId,cover,(User) authentication.getPrincipal());
+        return ResponseEntity.accepted().build();
+    }
+
 
 
 
