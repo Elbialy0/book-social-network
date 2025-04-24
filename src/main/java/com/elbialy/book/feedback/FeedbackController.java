@@ -1,0 +1,25 @@
+package com.elbialy.book.feedback;
+
+import com.elbialy.book.user.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/feedback")
+@RequiredArgsConstructor
+@Tag(name = "Feedback")
+public class FeedbackController {
+    private final FeedbackService feedbackService;
+
+    @PostMapping
+    public ResponseEntity<Integer> saveFeedback(FeedbackRequest feedbackRequest
+    , Authentication authentication){
+       return ResponseEntity.ok(feedbackService.save(feedbackRequest,(User) authentication.getPrincipal()));
+    }
+}
