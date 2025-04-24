@@ -9,16 +9,19 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
@@ -49,20 +52,11 @@ public class BookService {
 
     }
 
-    public BookResponse findById(Integer bookId) {
+    public BookResponse findById(Integer bookId) throws IOException {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
-        return BookResponse.builder()
-                .rate(book.getRate())
-                .isbn(book.getIsbn())
-                .shareable(book.isShareable())
-                .synopsis(book.getSynopsis())
-                .title(book.getTitle())
-                .authorName(book.getAuthorName())
-                .archived(book.isArchived())
-                .bookId(bookId)
-                .owner(book.getOwner().getFullName())
-                .build();
+
+        return Mapper.bookToBookResponse(book);
     }
 
 
@@ -101,8 +95,19 @@ public class BookService {
 
 
     }
+
+
+    @SneakyThrows
     public static PageResponse<BookResponse> pageResponse(Page<Book> books){
-        List<BookResponse> bookResponses = books.getContent().stream().map(Mapper::bookToBookResponse).toList();
+        List<BookResponse> bookResponses = books.getContent().stream()
+                .map(book -> {
+                    try {
+                        return Mapper.bookToBookResponse(book);
+                    } catch (IOException e) {
+                        throw new UncheckedIOException(e);
+                    }
+                })
+                .toList();
         return new PageResponse<>(
                 bookResponses,
                 books.getNumber(),
@@ -254,6 +259,11 @@ public class BookService {
         book.setBookCover(savedCover.getAbsolutePath());
         bookRepository.save(book);
 
+    }
+
+
+    public Book findBook(int id) {
+        return bookRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Book not found"));
     }
 }
 
