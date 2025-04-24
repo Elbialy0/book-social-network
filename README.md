@@ -1,61 +1,42 @@
 # Book Social Network
 
-A social platform for book enthusiasts to share, manage, and borrow books from other users.
-
-## Prerequisites
-
-- Java 17 or higher
-- Docker and Docker Compose
-- Maven
-
-## Setup and Installation
-
-1. Clone the repository
-2. Start the required services using Docker:
-   ```bash
-   docker-compose up -d
-   ```
-3. Build and run the application:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
+A Spring Boot application that provides a social platform for book enthusiasts to share feedback and interact with
+books.
 
 ## Features
 
-- Book management (add, update, archive)
-- Book sharing system
-- Book borrowing functionality
-- Feedback and rating system
-- User authentication
-- Book cover image upload
+- User authentication and authorization with JWT
+- Book feedback and rating system
+- RESTful API endpoints
+- Pagination support for book feedback
+- Email notifications
+- Swagger/OpenAPI documentation
 
-## API Endpoints
+## Technology Stack
 
-### Books
+- Java 21
+- Spring Boot 3.4.3
+- Spring Security
+- Spring Data JPA
+- PostgreSQL
+- JWT Authentication
+- Lombok
+- Maven
+- OpenAPI/Swagger Documentation
 
-- `POST /books/save` - Add a new book
-- `GET /books/{book-id}` - Get book details
-- `GET /books/getBooks` - Get paginated list of books
-- `GET /books/owner` - Get user's books
-- `GET /books/borrowed` - Get borrowed books
-- `GET /books/returned` - Get returned books
-- `PATCH /books/shareable/{book-id}` - Update book's shareable status
-- `PATCH /books/archive/{book-id}` - Archive/unarchive book
-- `POST /books/borrow/{book-id}` - Borrow a book
-- `PATCH /books/borrow/returned/{book-id}` - Mark book as returned
-- `PATCH /books/borrow/return/approved/{book-id}` - Approve book return
-- `POST /books/book-cover` - Upload book cover
+## API Documentation
 
-## Database
+The API documentation is available through Swagger UI:
 
-PostgreSQL database is used for data storage with the following configuration:
+- Local: http://localhost:8080/swagger-ui.html
+## Installation & Setup
 
-- Database Name: book_social_network
-- Port: 5432
+1. Clone the repository
+2. Ensure you have Java 21 and Maven installed
+3. Configure PostgreSQL database
+4. Update application.properties with your database credentials
+5. Run `mvn clean install`
+6. Start the application with `mvn spring-boot:run`
 
-## Email Service
 
-MailDev is used for development email testing:
 
-- SMTP Port: 1025
-- Web Interface Port: 3080
